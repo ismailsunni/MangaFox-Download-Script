@@ -18,15 +18,15 @@ Usage
 -----
 To download an entire series
 
-    ~ $ python mfdl.py [MANGA_NAME]
+    ~ $ python mfdl.py [MANGA_NAME] [optional -c]
 
 To download a specific chapter (downloads wrong chapter if a manga has a strange numbering scheme like starting with 0)
 
-    ~ $ python mfdl.py [MANGA_NAME] [CHAPTER_NUMBER]
+    ~ $ python mfdl.py [MANGA_NAME] [CHAPTER_NUMBER] [optional -c]
 
 To download a range of manga chapter (same caveats as above):
 
-    ~ $ python mfdl.py [MANGA_NAME] [RANGE_START] [RANGE_END]
+    ~ $ python mfdl.py [MANGA_NAME] [RANGE_START] [RANGE_END] [optional -c]
 
 Examples
 --------

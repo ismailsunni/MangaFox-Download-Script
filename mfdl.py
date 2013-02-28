@@ -36,8 +36,10 @@ def get_chapter_urls(manga_name):
     for link in links:
         chapters.append(link['href'])
     if(len(links) == 0):
-        print "Warning: Manga either unable to be found, or no chapters - please check the url above";
-    return list(set(chapters)) # ugly yo-yo code to remove duplicates
+        my_msg = "Warning: Manga either unable to be found, or no chapters "
+        my_msg += "- please check the url above"
+        print my_msg
+    return list(set(chapters))  # ugly yo-yo code to remove duplicates
 
 
 def get_page_numbers(soup):
@@ -100,7 +102,7 @@ def makecbz(dirname):
     myzip.close()
 
 
-def download_manga_range(manga_name, range_start, range_end):
+def download_manga_range(manga_name, range_start, range_end, compress=False):
     """Download a range of a chapters"""
     print "Getting chapter urls"
     chapter_urls = get_chapter_urls(manga_name)
@@ -113,12 +115,13 @@ def download_manga_range(manga_name, range_start, range_end):
         image_urls = get_chapter_image_urls(url_fragment)
         download_urls(image_urls, manga_name, chapter_number)
         download_dir = "./{0}/{1}".format(manga_name, chapter_number)
-        makecbz(download_dir)
-        shutil.rmtree(download_dir)
+        if compress:
+            makecbz(download_dir)
+            shutil.rmtree(download_dir)
     os.remove("page.html")
 
 
-def download_manga(manga_name, chapter_number=None):
+def download_manga(manga_name, chapter_number=None, compress=False):
     """Download all chapters of a manga"""
     chapter_urls = get_chapter_urls(manga_name)
     chapter_urls.sort()
@@ -131,8 +134,9 @@ def download_manga(manga_name, chapter_number=None):
         image_urls = get_chapter_image_urls(url_fragment)
         download_urls(image_urls, manga_name, chapter_number)
         download_dir = "./{0}/{1}".format(manga_name, chapter_number)
-        makecbz(download_dir)
-        shutil.rmtree(download_dir)
+        if compress:
+            makecbz(download_dir)
+            shutil.rmtree(download_dir)
     else:
         for url_fragment in chapter_urls:
             chapter_number = get_chapter_number(url_fragment)
@@ -142,18 +146,27 @@ def download_manga(manga_name, chapter_number=None):
             image_urls = get_chapter_image_urls(url_fragment)
             download_urls(image_urls, manga_name, chapter_number)
             download_dir = "./{0}/{1}".format(manga_name, chapter_number)
-            makecbz(download_dir)
-            shutil.rmtree(download_dir)
+            if compress:
+                makecbz(download_dir)
+                shutil.rmtree(download_dir)
     os.remove("page.html")
 
 if __name__ == '__main__':
-    if len(sys.argv) == 4:
-        download_manga_range(sys.argv[1], sys.argv[2], sys.argv[3])
-    elif len(sys.argv) == 3:
-        download_manga(sys.argv[1], sys.argv[2])
-    elif len(sys.argv) == 2:
-        download_manga(sys.argv[1])
+    num_argv = len(sys.argv)
+    compress = False
+    if sys.argv[num_argv - 1] == '-c':
+        compress = True
+        num_argv -= 1
+    if num_argv == 4:
+        download_manga_range(sys.argv[1], sys.argv[2], sys.argv[3], compress)
+    elif num_argv == 3:
+        download_manga(sys.argv[1], sys.argv[2], compress)
+    elif num_argv == 2:
+        download_manga(sys.argv[1], compress)
     else:
-        print("USAGE: mfdl.py [MANGA_NAME]")
-        print("       mfdl.py [MANGA_NAME] [CHAPTER_NUMBER]")
-        print("       mfdl.py [MANGA_NAME] [RANGE_START] [RANGE_END]")
+        print("USAGE: mfdl.py [MANGA_NAME] [optional -c]")
+        print("       mfdl.py [MANGA_NAME] [CHAPTER_NUMBER] [optional -c]")
+        print("       mfdl.py [MANGA_NAME] [RANGE_START] [RANGE_END] \
+[optional -c]")
+        print("\n")
+        print("optional -c : for compress the manga per chapter")
